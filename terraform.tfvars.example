@@ -1,0 +1,12 @@
+# Copy this file to terraform.tfvars and fill in your actual values
+# terraform.tfvars is gitignored and will not be committed
+
+hcloud_token    = "your-hetzner-cloud-api-token-here"
+ssh_public_key  = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... your-email@example.com"
+ssh_key_name    = "homelab-key"
+tailscale_authkey = "tskey-auth-xxxxx-xxxxxx"  # Optional: leave empty if configuring Tailscale manually
+
+# Optional overrides (defaults are set in variables.tf)
+# region        = "ash"
+# instance_type = "cax11"
+# instance_name = "homelab-vps"
