@@ -92,9 +92,6 @@ for service in $SERVICES; do
         "pihole")
             echo "- Pi-hole:     http://$SERVER_IP:8080/admin"
             ;;
-        "ghostfolio")
-            echo "- Ghostfolio:  http://$SERVER_IP:3333"
-            ;;
         *)
             echo "- $service:    (Check docker-compose.yml for port)"
             ;;

@@ -77,15 +77,4 @@ resource "hcloud_firewall" "homelab" {
       "::/0"
     ]
   }
-
-  # Ghostfolio Web UI
-  rule {
-    direction = "in"
-    protocol  = "tcp"
-    port      = "3333"
-    source_ips = [
-      "0.0.0.0/0",
-      "::/0"
-    ]
-  }
 }
