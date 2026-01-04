@@ -44,4 +44,37 @@ resource "hcloud_firewall" "homelab" {
       "::/0"
     ]
   }
+
+  # n8n Web UI
+  rule {
+    direction = "in"
+    protocol  = "tcp"
+    port      = "5678"
+    source_ips = [
+      "0.0.0.0/0",
+      "::/0"
+    ]
+  }
+
+  # Pi-hole Web UI
+  rule {
+    direction = "in"
+    protocol  = "tcp"
+    port      = "8080"
+    source_ips = [
+      "0.0.0.0/0",
+      "::/0"
+    ]
+  }
+
+  # Miniflux Web UI
+  rule {
+    direction = "in"
+    protocol  = "tcp"
+    port      = "8081"
+    source_ips = [
+      "0.0.0.0/0",
+      "::/0"
+    ]
+  }
 }
