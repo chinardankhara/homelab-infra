@@ -68,7 +68,10 @@ scp -r services/* root@"$SERVER_IP":/root/services/
 
 echo "--> Starting Services..."
 
-for service in n8n miniflux pihole; do
+# Dynamically find all services in the services directory
+SERVICES=$(ssh root@"$SERVER_IP" "ls -d /root/services/*/ | xargs -n 1 basename")
+
+for service in $SERVICES; do
     echo "Starting $service..."
     ssh root@"$SERVER_IP" "cd /root/services/$service && docker compose up -d"
 done
@@ -77,7 +80,24 @@ echo "========================================================"
 echo "Deployment Complete!"
 echo "Services should be running."
 echo "--------------------------------------------------------"
-echo "Check N8N:      http://$SERVER_IP:5678"
-echo "Check Miniflux: http://$SERVER_IP:8081"
-echo "Check Pi-hole:  http://$SERVER_IP:8080/admin"
+echo "Services should be running at:"
+for service in $SERVICES; do
+    case $service in
+        "n8n")
+            echo "- N8N:         http://$SERVER_IP:5678"
+            ;;
+        "miniflux")
+            echo "- Miniflux:    http://$SERVER_IP:8081"
+            ;;
+        "pihole")
+            echo "- Pi-hole:     http://$SERVER_IP:8080/admin"
+            ;;
+        "ghostfolio")
+            echo "- Ghostfolio:  http://$SERVER_IP:3333"
+            ;;
+        *)
+            echo "- $service:    (Check docker-compose.yml for port)"
+            ;;
+    esac
+done
 echo "========================================================"
