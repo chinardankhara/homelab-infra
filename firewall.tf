@@ -77,4 +77,15 @@ resource "hcloud_firewall" "homelab" {
       "::/0"
     ]
   }
+
+  # Actual Budget Web UI
+  rule {
+    direction = "in"
+    protocol  = "tcp"
+    port      = "5006"
+    source_ips = [
+      "0.0.0.0/0",
+      "::/0"
+    ]
+  }
 }
