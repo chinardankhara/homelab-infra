@@ -1,0 +1,11 @@
+services:
+  actual_server:
+    image: actualbudget/actual-server:latest
+    container_name: actual-server
+    ports:
+      - '5006:5006'
+    volumes:
+      - ./actual-data:/data
+    environment:
+      - ACTUAL_BANK_SYNC_SIMPLEFIN=true
+    restart: unless-stopped
