@@ -1,24 +1,30 @@
 # Actual Budget
 actual.yourdomain.com {
-    reverse_proxy host.docker.internal:5006
+reverse_proxy host.docker.internal:5006
 }
 
 # n8n Automation
 n8n.yourdomain.com {
-    reverse_proxy host.docker.internal:5678
+reverse_proxy host.docker.internal:5678
 }
 
 # Miniflux RSS Reader
 rss.yourdomain.com {
-    reverse_proxy host.docker.internal:8081
+reverse_proxy host.docker.internal:8081
 }
 
 # Pi-hole Admin
 pihole.yourdomain.com {
-    reverse_proxy host.docker.internal:8080
+redir / /admin permanent
+reverse_proxy host.docker.internal:8080
 }
 
 # Uptime Kuma Monitoring
 status.yourdomain.com {
-    reverse_proxy host.docker.internal:3001
+reverse_proxy host.docker.internal:3001
+}
+
+# Monica Personal CRM
+crm.yourdomain.com {
+reverse_proxy host.docker.internal:8085
 }

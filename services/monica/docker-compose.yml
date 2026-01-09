@@ -1,0 +1,37 @@
+services:
+  monica:
+    image: monica:latest
+    container_name: monica
+    depends_on:
+      - monica-db
+    ports:
+      - "8085:80"
+    environment:
+      - APP_ENV=production
+      - APP_KEY=base64:>CHANGE_ME_RUN_openssl_rand_base64_32
+      - APP_URL=https://crm.yourdomain.com
+      - DB_CONNECTION=mysql
+      - DB_HOST=monica-db
+      - DB_PORT=3306
+      - DB_DATABASE=monica
+      - DB_USERNAME=monica
+      - DB_PASSWORD=CHANGE_ME_secure_password
+    volumes:
+      - monica_data:/var/www/html/storage
+    restart: unless-stopped
+
+  monica-db:
+    image: mysql:8.0
+    container_name: monica-db
+    environment:
+      - MYSQL_ROOT_PASSWORD=CHANGE_ME_root_password
+      - MYSQL_DATABASE=monica
+      - MYSQL_USER=monica
+      - MYSQL_PASSWORD=CHANGE_ME_secure_password
+    volumes:
+      - monica_db_data:/var/lib/mysql
+    restart: unless-stopped
+
+volumes:
+  monica_data:
+  monica_db_data:
