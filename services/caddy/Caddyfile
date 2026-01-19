@@ -28,3 +28,8 @@ reverse_proxy host.docker.internal:3001
 crm.yourdomain.com {
 reverse_proxy host.docker.internal:8085
 }
+
+# Mealie Recipe Manager
+recipes.yourdomain.com {
+reverse_proxy host.docker.internal:9925
+}

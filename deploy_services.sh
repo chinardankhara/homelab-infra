@@ -84,25 +84,31 @@ echo "Services should be running at:"
 for service in $SERVICES; do
     case $service in
         "n8n")
-            echo "- N8N:         http://$SERVER_IP:5678"
+            echo "- N8N:           https://n8n.yourdomain.com"
             ;;
         "miniflux")
-            echo "- Miniflux:    http://$SERVER_IP:8081"
+            echo "- Miniflux:      https://rss.yourdomain.com"
             ;;
         "pihole")
-            echo "- Pi-hole:     http://$SERVER_IP:8080/admin"
+            echo "- Pi-hole:       https://pihole.yourdomain.com"
             ;;
         "actual")
-            echo "- Actual:      https://actual.yourdomain.com"
+            echo "- Actual:        https://actual.yourdomain.com"
             ;;
         "uptime-kuma")
-            echo "- Status:      https://status.yourdomain.com"
+            echo "- Uptime Kuma:   https://status.yourdomain.com"
+            ;;
+        "monica")
+            echo "- Monica CRM:    https://crm.yourdomain.com"
+            ;;
+        "mealie")
+            echo "- Mealie:        https://recipes.yourdomain.com"
             ;;
         "caddy")
-            echo "- Caddy:       Reverse proxy running (manages HTTPS)"
+            echo "- Caddy:         Reverse proxy running (manages HTTPS)"
             ;;
         *)
-            echo "- $service:    (Check docker-compose.yml for port)"
+            echo "- $service:      (Check docker-compose.yml for port)"
             ;;
     esac
 done
