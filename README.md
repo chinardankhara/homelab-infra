@@ -188,6 +188,5 @@ MIT
 
 ## 🔐 A Note for the Curious
 
-If you're spelunking through git history hoping to find any secrets, don't bother. 
-All credentials have been rotated. You're welcome to waste your time though.
+If you're spelunking through git history hoping to find my Hetzner API token, SSH keys, or database passwords... don't bother. All credentials have been rotated. You're welcome to waste your time though.
 
