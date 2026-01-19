@@ -1,191 +1,197 @@
-# Virtual Homelab Infrastructure
+# 🏠 Homelab Infrastructure
 
-Terraform configuration for provisioning a Virtual Homelab VPS on Hetzner Cloud.
+A complete self-hosted stack on Hetzner Cloud with automatic HTTPS. **~€7.50/month**.
 
-## 📋 Overview
+## What You Get
 
-- **Provider**: Hetzner Cloud
-- **Region**: Ashburn (ash)
-- **Instance**: CAX11 (ARM64, 2 vCPU, 4GB RAM)
-- **OS**: Ubuntu 24.04 LTS
-- **Pre-installed**: Docker, Docker Compose v2, Tailscale
+| Service | Purpose | URL |
+|---------|---------|-----|
+| **Actual Budget** | Privacy-focused budgeting | `actual.yourdomain.com` |
+| **n8n** | Workflow automation | `n8n.yourdomain.com` |
+| **Miniflux** | Minimalist RSS reader | `rss.yourdomain.com` |
+| **Pi-hole** | Network-wide ad blocking | `pihole.yourdomain.com` |
+| **Uptime Kuma** | Uptime monitoring | `status.yourdomain.com` |
+| **Monica** | Personal CRM | `crm.yourdomain.com` |
+| **Mealie** | Recipe manager | `recipes.yourdomain.com` |
 
-## 🚀 Quick Start
+All services run behind **Caddy** with automatic HTTPS certificates.
+
+---
+
+## Quick Start (< 5 minutes)
 
 ### Prerequisites
+- [Terraform](https://terraform.io) installed
+- [Hetzner Cloud](https://hetzner.cloud) account + API token
+- Domain with DNS access
+- SSH key pair (`ssh-keygen -t ed25519`)
 
-1. **Hetzner Cloud Account**: [Sign up here](https://www.hetzner.com/cloud)
-2. **API Token**: Generate from Hetzner Cloud Console → Security → API Tokens
-3. **SSH Key**: Generate if needed: `ssh-keygen -t ed25519 -C "your-email@example.com"`
-4. **Tailscale Account** (optional): [Get auth key](https://login.tailscale.com/admin/settings/keys)
-
-### Installation
+### 1. Clone & Setup
 
 ```bash
-# 1. Clone this repository
-git clone <your-repo-url>
+git clone https://github.com/YOUR_USERNAME/homelab-infra.git
 cd homelab-infra
 
-# 2. Install Terraform (if not already installed)
-# macOS:
-brew install terraform
-
-# Linux:
-wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-sudo apt update && sudo apt install terraform
-
-# 3. Create your variables file
+# Create your config files
 cp terraform.tfvars.example terraform.tfvars
-
-# 4. Edit terraform.tfvars with your values
-nano terraform.tfvars
+cp .env.example .env
 ```
 
-### Configuration
+### 2. Configure Terraform
 
 Edit `terraform.tfvars`:
-
 ```hcl
-hcloud_token      = "your-hetzner-api-token"
-ssh_public_key    = "ssh-ed25519 AAAAC3... your-email@example.com"
-tailscale_authkey = "tskey-auth-xxxxx"  # Optional
+hcloud_token   = "your-hetzner-api-token"
+ssh_public_key = "ssh-ed25519 AAAA... you@email.com"
+ssh_key_name   = "homelab-key"
 ```
 
-### Deployment
+### 3. Configure Services
+
+**Option A: Quick (use defaults, change passwords later in UI)**
+- Just update your domain in the files below
+
+**Option B: Secure (recommended)**
+- Generate secrets:
+  ```bash
+  openssl rand -base64 32  # For Monica APP_KEY
+  openssl rand -base64 16  # For passwords
+  ```
+- Copy and edit service configs:
+  ```bash
+  mkdir -p local/services/{monica,caddy,mealie,n8n,miniflux}
+  cp services/monica/docker-compose.yml local/services/monica/
+  cp services/caddy/Caddyfile local/services/caddy/
+  # ... edit with your domain and secrets
+  ```
+
+### 4. Update Domain
+
+Replace `yourdomain.com` with your domain:
+```bash
+# In services/caddy/Caddyfile (or local/services/caddy/Caddyfile)
+# In services/monica/docker-compose.yml
+# In services/mealie/docker-compose.yml  
+# In deploy_services.sh
+```
+
+Or use sed:
+```bash
+find services -type f \( -name "*.yml" -o -name "Caddyfile" \) \
+  -exec sed -i '' 's/yourdomain\.com/YOUR_DOMAIN/g' {} \;
+sed -i '' 's/yourdomain\.com/YOUR_DOMAIN/g' deploy_services.sh
+```
+
+### 5. Deploy Infrastructure
 
 ```bash
-# Initialize Terraform
 terraform init
-
-# Preview changes
-terraform plan
-
-# Apply configuration
 terraform apply
-
-# View outputs
-terraform output
+# Note the IP address from output
 ```
 
-## 📦 What Gets Provisioned
+### 6. Add DNS Records
 
-| Resource | Description |
-|----------|-------------|
-| `hcloud_ssh_key` | SSH key for server access |
-| `hcloud_firewall` | Firewall rules (SSH, HTTP, HTTPS, Tailscale) |
-| `hcloud_server` | CAX11 ARM server in Ashburn |
+Create A records pointing to your server IP:
 
-### Firewall Rules
+| Host | Value |
+|------|-------|
+| `actual` | `SERVER_IP` |
+| `n8n` | `SERVER_IP` |
+| `rss` | `SERVER_IP` |
+| `pihole` | `SERVER_IP` |
+| `status` | `SERVER_IP` |
+| `crm` | `SERVER_IP` |
+| `recipes` | `SERVER_IP` |
 
-| Port | Protocol | Purpose |
-|------|----------|---------|
-| 22 | TCP | SSH |
-| 80 | TCP | HTTP |
-| 443 | TCP | HTTPS |
-| 41641 | UDP | Tailscale WireGuard |
-
-## 🔧 Post-Deployment
-
-### Connect to Server
+### 7. Deploy Services
 
 ```bash
-# SSH (output from terraform)
-ssh root@<public-ipv4>
-
-# Verify Docker
-docker --version
-docker compose version
-
-# Verify Tailscale
-tailscale status
-tailscale ip
+ssh-add ~/.ssh/your_private_key
+./deploy_services.sh
 ```
 
-### Manual Tailscale Setup (if authkey not provided)
+Done! Wait a few minutes for DNS propagation and HTTPS certificates.
 
-```bash
-ssh root@<public-ipv4>
-tailscale up
-# Follow the URL to authenticate
-```
+---
 
-## 🗂️ File Structure
+## Project Structure
 
 ```
 homelab-infra/
-├── provider.tf              # Hetzner Cloud provider config
-├── variables.tf             # Input variable definitions
-├── terraform.tfvars.example # Template for secrets
-├── vpc.tf                   # Private network (optional)
-├── firewall.tf              # Security rules
-├── compute.tf               # Server instance
-├── outputs.tf               # Output values
-├── cloud-init.yaml          # Provisioning script
-├── .gitignore               # Git exclusions
-└── README.md                # This file
+├── services/           # Service definitions (templates)
+│   ├── actual/
+│   ├── caddy/          # Reverse proxy config
+│   ├── mealie/
+│   ├── miniflux/
+│   ├── monica/
+│   ├── n8n/
+│   ├── pihole/
+│   └── uptime-kuma/
+├── local/              # Your overrides (gitignored)
+│   └── services/       # Put your real configs here
+├── compute.tf          # Server definition
+├── firewall.tf         # Firewall rules
+├── cloud-init.yaml     # Server bootstrap (Docker, Tailscale)
+├── deploy_services.sh  # Deployment script
+└── terraform.tfvars.example
 ```
 
-## 🔐 Security Notes
+---
 
-- **Never commit** `terraform.tfvars` (contains secrets)
-- **State files** contain sensitive data - consider [remote backend](https://developer.hashicorp.com/terraform/language/settings/backends/configuration)
-- **SSH keys**: Only public keys are in Terraform; keep private keys secure
-- **API tokens**: Rotate regularly, use read-only tokens where possible
-- **Tailscale**: Use ephemeral keys for better security
+## How Local Overrides Work
 
-## 🧹 Cleanup
+The `services/` folder contains templates with placeholder values.
 
-```bash
-# Destroy all resources
-terraform destroy
+Your real configs go in `local/services/` which is gitignored.
 
-# Remove Terraform state (optional, be careful!)
-rm -rf .terraform terraform.tfstate*
-```
+**Deploy script behavior:**
+1. Syncs `services/*` to server (templates)
+2. Overlays `local/services/*` on top (your real configs)
 
-## 📚 Additional Resources
+This lets you share the repo without exposing secrets.
 
-- [Hetzner Cloud Docs](https://docs.hetzner.com/cloud/)
-- [Terraform Hetzner Provider](https://registry.terraform.io/providers/hetznercloud/hcloud/latest/docs)
-- [Docker Documentation](https://docs.docker.com/)
-- [Tailscale Docs](https://tailscale.com/kb/)
+---
 
-## 💰 Cost Estimate
+## Adding Services
 
-- **CAX11 (ARM)**: ~€4.51/month (~$5/month)
-- **Traffic**: 20TB included
-- **Backups**: Optional, +20% of server cost
+1. Create `services/yourservice/docker-compose.yml`
+2. Add entry to `services/caddy/Caddyfile`
+3. Add DNS record
+4. Run `./deploy_services.sh`
 
-## 🛠️ Troubleshooting
+---
 
-### Server not accessible after apply
+## Security Notes
 
-```bash
-# Check server status
-terraform show | grep status
+- Change all `CHANGE_ME` passwords before deploying
+- Pi-hole generates a random password on first run (check logs)
+- All traffic is HTTPS via Caddy
+- Consider using Tailscale for private access
 
-# Wait 2-3 minutes for cloud-init to complete
-ssh root@<ip> 'tail -f /var/log/cloud-init-output.log'
-```
+---
 
-### Docker not installed
+## Costs
 
-```bash
-# Cloud-init may still be running
-ssh root@<ip> 'cloud-init status'
+| Item | Cost |
+|------|------|
+| Hetzner CPX21 (3 vCPU, 4GB RAM) | ~€7.50/month |
+| Domain | ~$10-15/year |
 
-# Check logs
-ssh root@<ip> 'journalctl -u cloud-init -f'
-```
+---
 
-### Tailscale not connected
-
-```bash
-ssh root@<ip>
-tailscale up --authkey=<your-key>
-```
-
-## 📝 License
+## License
 
 MIT
+
+---
+
+## 🔐 A Note for the Curious
+
+If you're spelunking through git history hoping to find my Hetzner API token, SSH keys, or database passwords... don't bother. ☕
+
+All credentials have been rotated. You're welcome to waste your time though — I admire the hustle.
+
+---
+
+*Built with ❤️ and mass overconsumption of caffeine.*

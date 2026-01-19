@@ -8,7 +8,7 @@ services:
       - "8085:80"
     environment:
       - APP_ENV=production
-      - APP_KEY=base64:>CHANGE_ME_RUN_openssl_rand_base64_32
+      - APP_KEY=base64:CHANGE_ME_RUN_openssl_rand_base64_32
       - APP_URL=https://crm.yourdomain.com
       - DB_CONNECTION=mysql
       - DB_HOST=monica-db

@@ -12,6 +12,13 @@ override.tf.json
 .terraformrc
 terraform.rc
 
+# Environment / Secrets
+.env
+!.env.example
+
+# Local overrides (your real config)
+local/
+
 # IDE
 .idea/
 .vscode/

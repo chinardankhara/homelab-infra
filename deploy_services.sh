@@ -64,7 +64,20 @@ echo "Tailscale seems operational."
 echo "--> Syncing service definitions..."
 # Ensure default destination directory exists
 ssh root@"$SERVER_IP" "mkdir -p /root/services"
+
+# First, sync the base service definitions
 scp -r services/* root@"$SERVER_IP":/root/services/
+
+# Then, overlay any local overrides (contains real secrets/domain)
+if [ -d "local/services" ]; then
+    echo "--> Applying local overrides..."
+    for local_svc in local/services/*/; do
+        svc_name=$(basename "$local_svc")
+        if [ -d "$local_svc" ]; then
+            scp -r "$local_svc"* root@"$SERVER_IP":/root/services/"$svc_name"/
+        fi
+    done
+fi
 
 echo "--> Starting Services..."
 
