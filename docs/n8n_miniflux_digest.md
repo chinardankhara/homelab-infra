@@ -9,7 +9,7 @@ This guide walks you through creating an automated workflow in n8n that fetches 
 ---
 
 ## Step 1: Generate Miniflux API Key
-1. Open Miniflux (`http://SERVER_IP:8081`) and log in.
+1. Open Miniflux (`https://rss.yourdomain.com`) and log in.
 2. Go to **Settings** -> **API Keys**.
 3. Click **Create a new API key**.
 4. Description: `n8n automation`.
@@ -19,7 +19,7 @@ This guide walks you through creating an automated workflow in n8n that fetches 
 
 ## Step 2: Create the n8n Workflow
 
-1. Open n8n (`http://SERVER_IP:5678`) and create a **New Workflow**.
+1. Open n8n (`https://n8n.yourdomain.com`) and create a **New Workflow**.
 
 ### Node 1: Schedule Trigger
 - **Add Node**: Search for **Schedule**.
@@ -41,8 +41,8 @@ We need to tell Miniflux to only give us entries after a certain time.
 - **Add Node**: Search for **HTTP Request**.
 - **Settings**:
   - **Method**: `GET`
-  - **URL**: `http://SERVER_IP:8081/v1/entries`
-    - *Note: Using the server IP allows n8n to reach Miniflux.*
+  - **URL**: `https://rss.yourdomain.com/v1/entries`
+    - *Note: You can also use a private/internal address if your n8n instance cannot resolve public DNS from inside your network.*
   - **Authentication**: `Generic Credential Type` -> `Header Auth`
     - Create a new Credential:
       - **Name**: `Miniflux API`
