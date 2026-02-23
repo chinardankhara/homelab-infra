@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Allow explicit bypass for emergency commits.
+if [[ "${SKIP_GITLEAKS:-}" == "1" ]]; then
+  echo "SKIP_GITLEAKS=1 set; skipping secret scan."
+  exit 0
+fi
+
+if ! command -v gitleaks >/dev/null 2>&1; then
+  cat <<'EOF'
+ERROR: gitleaks is required for pre-commit secret scanning.
+
+Install:
+  brew install gitleaks
+
+To bypass once (not recommended):
+  SKIP_GITLEAKS=1 git commit ...
+EOF
+  exit 1
+fi
+
+echo "Running gitleaks on staged changes..."
+gitleaks git --staged --redact --no-banner --exit-code 1 .

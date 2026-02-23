@@ -26,6 +26,15 @@ All services run behind **Caddy** with automatic HTTPS certificates.
 - Domain with DNS access
 - SSH key pair (`ssh-keygen -t ed25519`)
 
+### Optional: Enable Pre-Commit Secret Scanning (Recommended)
+
+```bash
+brew install gitleaks
+git config core.hooksPath .githooks
+```
+
+This repo includes `.githooks/pre-commit`, which runs `gitleaks` against staged changes and blocks commits if secrets are detected.
+
 ### 1. Clone & Setup
 
 ```bash
@@ -189,4 +198,3 @@ MIT
 ## 🔐 A Note for the Curious
 
 If you're spelunking through git history hoping to find my Hetzner API token, SSH keys, or database passwords... don't bother. All credentials have been rotated. You're welcome to waste your time though.
-
